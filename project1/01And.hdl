@@ -2,25 +2,12 @@
 * And gate:
 * if (a and b) out = 1, else out = 0
 */
-
 CHIP And
 {
     IN a, b;
     OUT out;
 
     PARTS:
-    Nand (a=a, b=b, out=anandb);
-    Nand (a=anandb, b=anandb, out=out);
+    Nand(a=a, b=b, out=NANDab);
+    Not(in=NANDab, out=out);
 }
-
-// a = 0, b = 0, out = anandb = 1
-// a = anandb = 1, b = anandb = 1, out = 0
-
-// a = 0, b = 1, out = anandb = 1
-// a = anandb = 1, b = anandb = 1, out = 0
-
-// a = 1, b = 0, out = anandb = 1
-// a = anandb = 1, b = anandb = 1, out = 0
-
-// a = 1, b = 1, out = anandb = 0
-// a = anandb = 0, b = anandb = 0, out = 1
