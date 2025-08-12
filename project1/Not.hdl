@@ -13,4 +13,4 @@ CHIP Not
 
     PARTS:
     Nand(a=in , b=in , out=out );
-} 
+}
