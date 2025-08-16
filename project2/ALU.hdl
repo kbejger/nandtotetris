@@ -1,4 +1,4 @@
-// This file is part of www.nand2tetris.org
+ // This file is part of www.nand2tetris.org
 // and the book "The Elements of Computing Systems"
 // by Nisan and Schocken, MIT Press.
 // File name: projects/2/ALU.hdl
@@ -41,28 +41,33 @@ CHIP ALU {
         ng;      // if (out < 0)  equals 1, else 0
 
     PARTS:
-    Mux16(a=x , b=false , sel=zx , out=zxMux );
-    Not16(in=zxMux , out=xNot );
-    Mux16(a=zxMux , b=xNot , sel=nx , out=xOut );
+    Mux16(a=x, b=false, sel=zx, out=xZX);
+    Mux16(a=y, b=false, sel=zy, out=yZY);
 
-    Mux16(a=y , b=false , sel=zy , out=zyMux );
-    Not16(in=zyMux , out=yNot );
-    Mux16(a=zyMux , b=yNot , sel=ny , out=yOut );
+    Not16(in=xZX, out=xZXNot);
+    Not16(in=yZY, out=yZYNot);
 
-    Add16(a =xOut , b =yOut , out =xyAdd );
-    And16(a=xOut , b=yOut , out=xyAnd );
-    Mux16(a=xyAnd , b=xyAdd , sel=f , out=fMux );
+    Mux16(a=xZX, b=xZXNot, sel=nx, out=xFinal);
+    Mux16(a=yZY, b=yZYNot, sel=ny, out=yFinal);
 
-    Not16(in=fMux , out=fNot );
-    Mux16(a=fMux , b=fNot , sel=no , out=out );    
-    Mux16(a=fMux , b=fNot , sel=no , out[0..7]=fOut1 );
-    Mux16(a=fMux , b=fNot , sel=no , out[8..15]=fOut2 );
+    And16(a=xFinal, b=yFinal, out=finalAnd);
+    Add16(a=xFinal, b=yFinal, out=finalAdd);
 
-    Or8Way(in=fOut1 , out=fOr1 );
-    Or8Way(in=fOut2 , out=fOr2 );
-    Or(a=fOr1 , b=fOr2 , out=fOr3 );
-    Not(in=fOr3 , out=zr );
+    Mux16(a=finalAnd, b=finalAdd, sel=f, out=final);
 
-    Or8Way(in=fOut2 , out=ng );
+    Not16(in=final, out=finalNot);
 
+    Mux16(a=final, b=finalNot, sel=no, out=out);
+
+    Mux16(a=final, b=finalNot, sel=no, out[0..7]=finalLow);
+    Mux16(a=final, b=finalNot, sel=no, out[8..15]=finalHigh);
+
+    Or8Way(in=finalHigh, out=ng);
+
+    // Or8Way(in[0..7]=final, out=finalLow);
+    // Or8Way(in[8..15]=final, out=finalHigh);
+
+    Or(a=finalLow, b=finalHigh, out=finalOr);
+
+    Not(in=finalOr, out=zr);
 }
